@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小源的网站</title>
+    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="shortcut icon" href="icon.png" type="image/png">
+    
+    <style>
+        /* 全局变量定义 - 统一控制主题色和宽高 */
+        :root {
+            --popup-default-width: 350px;    /* 弹窗默认宽度 */
+            --popup-default-height: 230px;   /* 弹窗默认高度 */
+            --popup-min-width: 100px;        /* 弹窗最小宽度 */
+            --popup-min-height: 60px;       /* 弹窗最小高度 */
+            --resize-edge-size: 1px;        /* 缩放热区尺寸 */
+            --img-placeholder-bg: #e3f2fd;   /* 图片加载占位背景色 */
+            
+            /* 主题色变量 - 默认蓝色 */
+            --theme-color: #0277bd;          /* 主主题色 */
+--theme-light: rgba(227, 242, 253, 0.5); /* 最后一位 0.8 是透明度（0-1 之间） */         /* 主题浅色（弹窗/主界面背景） */
+            --theme-opposite: #ff69b4;       /* 主题相反色（选择框） */
+        }
+        
+        /* 粉色主题变量 */
+        body.pink-theme {
+            --theme-color: #ff69b4;
+            --theme-light: rgba(255, 230, 242, 0.5); /* 0.8 可按需调整（0 完全透明，1 不透明） */
+            --theme-opposite: #0277bd;
+        }
+        
+        /* 引入Minecraft字体 */
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('Minecraft.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        body {
+            background-image: url("beijing.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: 'Minecraft', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px 0;
+            min-height: 100vh;
+            touch-action: manipulation;
+            overflow-x: hidden;
+        }
+        /* 新标题栏核心样式 */
+.new-header {
+    width: 100%; /* 布满屏幕宽度 */
+    height: 50px; /* 固定高度 */
+    background-color: rgba(255, 255, 255, 0.3); /* 半透明背景，可调整透明度 */
+    position: fixed; /* 固定在背景图最上方 */
+    top: 0;
+    left: 0;
+    z-index: 999; /* 层级高于所有元素，确保置顶 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 轻微阴影提升质感 */
+    /* 新增：左下角+右下角圆角 */
+    border-bottom-left-radius: 16px; /* 圆角大小，可按需调整（如12px/20px） */
+    border-bottom-right-radius: 16px;
+}
+
+/* 标题栏内容居中（可选，根据需求调整） */
+.new-header-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    padding-left: 20px; /* 左内边距，避免贴左 */
+    padding-right: 120px; /* 右内边距，避开右上角两个按钮（足够容纳按钮+间距） */
+    box-sizing: border-box; /* 确保内边距不撑大容器 */
+}
+
+/* 文字缩小样式保持不变 */
+.new-header-title {
+    font-size: 18px;
+    color: var(--theme-color);
+    white-space: nowrap; /* 可选：防止文字换行 */
+    overflow: hidden; /* 可选：文字过长时隐藏超出部分 */
+    text-overflow: ellipsis; /* 可选：文字过长时显示省略号 */
+}
+
+/* 标题栏logo样式（可选） */
+.new-header-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 标题栏文字样式（可选） */
+.new-header-title {
+    font-size: 18px;
+    color: var(--theme-color); /* 沿用主题色，与网站风格统一 */
+   
+}
+
+/* 深色模式下的新标题栏样式（同步适配） */
+body.dark-mode .new-header {
+    background-color: rgba(31, 41, 55, 0.3); /* 深色模式半透明背景 */
+}
+
+body.dark-mode .new-header-title {
+    color: #f3f4f6; /* 深色模式文字色 */
+}
+
+
+/* 调整右上角按钮位置，避免与标题栏重叠 */
+.top-right-buttons {
+    top: 35px; /* 从20px改为35px，与标题栏垂直居中对齐 */
+}
+        /* 主界面容器背景 - 使用当前主题浅色 */
+        .container {
+            width: 100%;
+    max-width: 400px;
+    background-color: var(--theme-light);
+    border-radius: 32px;
+    padding: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 100;
+    margin: 80px auto 40px; /* 关键：上边距80px（标题栏高度50px+30px间距），避免遮挡 */
+    position: relative;
+        }
+        
+        /* 新增右上角按钮样式 */
+        .top-right-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            z-index: 999;
+        }
+        .top-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2); /* ，可按需改 */;
+            border-radius: 8px;
+            padding: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s;
+        }
+        .top-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .top-btn:hover {
+            transform: scale(1.05);
+        }
+        .profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            margin-bottom: 12px;
+            background-color: var(--img-placeholder-bg); /* 图片占位 */
+        }
+        .profile-name {
+           font-size: 20px;
+    color: var(--theme-color);
+    margin-bottom: 4px;
+text-shadow: 1px 1px 5px rgba(225, 225, 225, 1);
+        }
+        .profile-english-name {
+            font-size: 10px;
+            color: #000;
+            margin-bottom: 16px;
+        }
+        .button-container {
+        background-color: rgba(255, 255, 255, 0.2); /* 可按需改数值 */
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 260px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+            outline: none;
+            z-index: 110; /* 按钮层级高于主容器 */
+            font-family: 'Minecraft', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        .btn:active {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn.selected {
+            box-shadow: 0 0 0 2px var(--theme-opposite), 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .btn-blue {
+            background-color: var(--theme-color); /* 按钮颜色保持主题色 */
+            color: white;
+        }
+        .btn-blue:hover {
+            background-color: #01579b; /* 蓝色主题hover加深 */
+        }
+        body.pink-theme .btn-blue:hover {
+            background-color: #e65c9a; /* 粉色主题hover加深 */
+        }
+        .btn-white {
+            background-color: rgba(255, 255, 255, 0.8); /* 80% 不透明度（半透明效果） */
+            color: #212121;
+            border: 1px solid #e0e0e0;
+        }
+        .btn-white:hover {
+            background-color: #f5f5f5;
+        }
+        /* 主题切换按钮图标样式 */
+        .theme-btn-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .blue-theme-icon {
+            background-color: #0277bd;
+        }
+        .pink-theme-icon {
+            background-color: #ff69b4;
+        }
+        @media (max-width: 375px) {
+            .container {
+                max-width: 95%;
+        margin: 70px auto 30px; /* 移动端适当减少间距，保持协调 */
+            }
+            .button-container {
+                max-width: 240px;
+            }
+            .social-panel, .resource-panel, .contact-panel, .fun-panel, .setting-panel, .blank-popup-panel {
+                width: 90%;
+                max-width: none;
+            }
+            .top-right-buttons {
+                top: 10px;
+                right: 10px;
+                gap: 8px;
+            }
+            .top-btn {
+                width: 32px;
+                height: 32px;
+            }
+        }
+        @media (max-height: 600px) {
+            body {
+                padding: 10px 0;
+            }
+            .container {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+            }
+            .btn {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+        /* 弹窗基础样式 - 修复遮挡问题：背景透明且不阻止底层点击 */
+        .social-detail, .resource-detail, .contact-detail, .fun-detail, .setting-detail, .blank-popup-detail {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent; /* 弹窗背景透明 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            pointer-events: none; /* 允许点击底层元素 */
+        }
+        .social-detail.active, .resource-detail.active, .contact-detail.active, .fun-detail.active, .setting-detail.active, .blank-popup-detail.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .social-panel, .resource-panel, .contact-panel, .fun-panel, .setting-panel, .blank-popup-panel {
+            background-color: rgba(255, 255, 255, 0.8); /* 80% 不透明度（半透明效果） */
+            border: 1px solid #ccc;
+            border-radius: 16px;
+            width: var(--popup-default-width);
+            height: var(--popup-default-height);
+            min-width: var(--popup-min-width);
+            min-height: var(--popup-min-height);
+            max-width: none;
+            max-height: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            position: absolute;
+            pointer-events: auto; /* 弹窗自身可交互 */
+            cursor: default;
+        }
+        /* 四边+四角缩放热区样式 */
+        .window-resize-edge {
+            position: absolute;
+            z-index: 10;
+            touch-action: none;
+        }
+        .window-resize-edge.left {
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: var(--resize-edge-size);
+            cursor: ew-resize;
+        }
+        .window-resize-edge.right {
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: var(--resize-edge-size);
+            cursor: ew-resize;
+        }
+        .window-resize-edge.top {
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: var(--resize-edge-size);
+            cursor: ns-resize;
+        }
+        .window-resize-edge.bottom {
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: var(--resize-edge-size);
+            cursor: ns-resize;
+        }
+        .window-resize-edge.corner-tl {
+            left: 0;
+            top: 0;
+            width: var(--resize-edge-size);
+            height: var(--resize-edge-size);
+            cursor: nesw-resize;
+        }
+        .window-resize-edge.corner-tr {
+            right: 0;
+            top: 0;
+            width: var(--resize-edge-size);
+            height: var(--resize-edge-size);
+            cursor: nwse-resize;
+        }
+        .window-resize-edge.corner-bl {
+            left: 0;
+            bottom: 0;
+            width: var(--resize-edge-size);
+            height: var(--resize-edge-size);
+            cursor: nwse-resize;
+        }
+        .window-resize-edge.corner-br {
+            right: 0;
+            bottom: 0;
+            width: var(--resize-edge-size);
+            height: var(--resize-edge-size);
+            cursor: nesw-resize;
+        }
+        .social-detail.active .social-panel, .resource-detail.active .resource-panel, .contact-detail.active .contact-panel, .fun-detail.active .fun-panel, .setting-detail.active .setting-panel, .blank-popup-detail.active .blank-popup-panel {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        /* 标题栏样式 */
+        .panel-header {
+            padding: 8px 16px;
+            background-color: rgba(248, 249, 250, 0.8); /* 不透明度 */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            position: relative;
+            z-index: 20;
+        }
+        .panel-header:active {
+            cursor: grabbing;
+        }
+        .panel-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .close-btn {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            position: relative;
+            z-index: 2002;
+        }
+        .close-btn::before,
+        .close-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 14px;
+            height: 2px;
+            background-color: #000;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+        .close-btn::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+        /* 内容容器样式 */
+        .panel-content-wrapper {
+            position: relative;
+            width: 100%;
+            height: calc(100% - 30px);
+            overflow: auto;overflow-x: hidden; /* 禁止水平滚动（左右滑） */
+        }
+        .panel-content-wrapper::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+        .panel-content-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .panel-content-wrapper::-webkit-scrollbar-thumb {
+            background: transparent;
+        }
+        /* 弹窗背景 - 使用当前主题浅色 */
+        .panel-content {
+            padding: 16px;
+            background-color: var(--theme-light);
+            min-height: 100%;
+            box-sizing: border-box;
+        }
+        .blank-popup-content {
+            padding: 20px 16px;
+            background-color: var(--theme-light);
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .popup-text {
+            font-size: 16px;
+            color: #212121;
+            text-align: center;
+            margin: 0;
+        }
+        .popup-btn-group {
+            display: flex;
+            gap: 12px;
+            position: absolute;
+            bottom: 20px;
+            right: 16px;
+        }
+        .popup-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .popup-btn-cancel {
+            background-color: #f5f5f5;
+            color: #212121;
+            border: 1px solid #e0e0e0;
+        }
+        .popup-btn-cancel:hover {
+            background-color: #e0e0e0;
+        }
+        .popup-btn-confirm {
+            background-color: var(--theme-color);
+            color: white;
+        }
+        .popup-btn-confirm:hover {
+            background-color: #01579b;
+        }
+        body.pink-theme .popup-btn-confirm:hover {
+            background-color: #e65c9a;
+        }
+        /* 设置面板样式 - 背景使用主题浅色 */
+        .setting-content {
+            padding: 20px 16px;
+            background-color: var(--theme-light);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 100%;
+            box-sizing: border-box;
+        }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        .setting-label {
+            font-size: 16px;
+            color: #212121;
+        }
+        .dark-mode-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* 主题切换按钮容器（设置页内） */
+        .theme-switch-group {
+            display: flex;
+            gap: 8px;
+        }
+        .theme-switch-btn {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+            border: 1px solid #e0e0e0;
+        }
+        .theme-switch-btn.active {
+            background-color: var(--theme-color);
+            color: white;
+            border-color: var(--theme-color);
+        }
+        /* 列表项样式 */
+        .social-item, .resource-item, .fun-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .social-item:last-child, .resource-item:last-child, .fun-item:last-child {
+            border-bottom: none;
+        }
+        .social-avatar, .resource-icon, .fun-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+            object-fit: cover;
+            background-color: var(--img-placeholder-bg);
+        }
+        .social-name, .resource-name, .fun-name {
+            font-size: 16px;
+            color: var(--theme-color);
+            flex-grow: 1;
+        }
+        .social-id {
+            font-size: 14px;
+            color: #212121;
+            margin-top: 4px;
+        }
+        .arrow-right {
+            width: 24px;
+            height: 24px;
+            position: relative;
+        }
+        .arrow-right::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            border-top: 2px solid var(--theme-color);
+            border-right: 2px solid var(--theme-color);
+            transform: translate(-30%, -50%) rotate(45deg);
+        }
+        /* 点击动画 */
+        .click-circle {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--theme-opposite);
+            transform: scale(0);
+            pointer-events: none;
+            z-index: 10000;
+        }
+        .click-circle.animate {
+            animation: clickCircle 1s ease-out forwards;
+        }
+        @keyframes clickCircle {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        /* 深色模式 */
+        body.dark-mode {
+            background-color: rgba(17, 24, 39, 0.5);
+            color: #fafafa;
+        }
+        body.dark-mode .container {
+            background-color: rgba(31, 41, 55, 0.5);
+        }
+        
+        body.dark-mode .button-container {
+            background-color: rgba(55, 65, 81, 0.4); /* 70% 不透明度（半透明效果） */
+        }
+        body.dark-mode .btn-white {
+            background-color: #4b5563;
+            color: #f3f4f6;
+            border-color: #6b7280;
+        }
+        body.dark-mode .btn-white:hover {
+            background-color: #6b7280;
+        }
+        body.dark-mode .panel-content,
+        body.dark-mode .blank-popup-content,
+        body.dark-mode .setting-content {
+            background-color: rgba(55, 65, 81, 0.8); /*  不透明度（半透明效果） */
+        }
+        body.dark-mode .panel-header {
+            background-color: rgba(31, 41, 55, 0.5); /*  不透明度 */
+            border-bottom-color: #374151;
+        }
+        body.dark-mode .panel-title {
+            color: #f3f4f6;
+        }
+        body.dark-mode .close-btn::before,
+        body.dark-mode .close-btn::after {
+            background-color: #f3f4f6;
+        }
+        body.dark-mode .social-name,
+        body.dark-mode .resource-name,
+        body.dark-mode .fun-name,
+        body.dark-mode .setting-label,
+        body.dark-mode .popup-text {
+            color: #f3f4f6;
+        }
+        body.dark-mode .social-id,
+        body.dark-mode .profile-english-name {
+            color: #fff;
+        }
+        body.dark-mode .arrow-right::before {
+            border-top-color: #d1d5db;
+            border-right-color: #d1d5db;
+        }
+        body.dark-mode .popup-btn-cancel {
+            background-color: #4b5563;
+            color: #f3f4f6;
+            border-color: #6b7280;
+        }
+        body.dark-mode .popup-btn-cancel:hover {
+            background-color: #6b7280;
+        }
+        body.dark-mode .top-btn {
+            background-color: rgba(55, 65, 81, 0.2); /*  不透明度（半透明效果） */
+        }
+        /* 开关样式 */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #6b7280;
+            transition: .3s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: rgba(255, 255, 255, 0.8); /* 80% 不透明度（半透明效果） */
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: var(--theme-color);
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        /* 拖动时样式 */
+        .panel-dragging {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+        /* 缩放时样式 */
+        .panel-resizing {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        /* 左上角欢迎通知样式 */
+        #welcomeNotification {
+            position: fixed;
+            top: 20px;
+            left: -300px;
+            padding: 12px 24px;
+            background-color: var(--theme-color);
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            transition: left 0.5s ease-in-out;
+        }
+        #welcomeNotification.show {
+            left: 20px;
+        }
+        /* 左下角设备信息样式 */
+.device-info {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1; /* 确保不被遮挡 */
+    font-size: 14px;
+    color: var(--theme-color);
+    text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+    background-color: rgba(255,255,255,0.2);
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+/* 深色模式适配 */
+body.dark-mode .device-info {
+    color: #f3f4f6;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+    background-color: rgba(55,65,81,0.4);
+}
+    </style>
+</head>
+<body>
+<body>
+    <!-- 新标题栏（布满屏幕+高度100px） -->
+    <div class="new-header">
+        <!-- 可自定义标题栏内容，比如网站名称、logo等，示例如下 -->
+        <div class="new-header-content">
+            <img data-src="icon.png" alt="网站logo" class="new-header-logo">
+            <div class="new-header-title">Xiaoyuan exclusive website. Xiaoyuan Nb </div>
+        </div>
+    </div>
+
+    <!-- 原来的欢迎通知、音频播放等代码保留 -->
+    <div id="welcomeNotification">欢迎</div>
+    <audio id="backgroundMusic" src="Music.mp3" loop>...</audio>
+    <!-- 其他原有代码... -->
+</body>
+    <!-- 欢迎通知 -->
+    <div id="welcomeNotification">欢迎</div>
+    
+    <!-- 音频播放 -->
+    <audio id="backgroundMusic" src="Music.mp3" loop>
+        您的浏览器不支持音频播放，请升级浏览器。
+    </audio>
+    
+    <!-- 新增右上角按钮 -->
+    <div class="top-right-buttons">
+        <button class="top-btn" id="musicBtn" onclick="toggleMusic()">
+            <img data-src="sy1.png" alt="音乐">
+        </button>
+        <button class="top-btn" id="settingBtn" onclick="openPanel('setting')">
+            <img data-src="shezhi.png" alt="设置">
+        </button>
+    </div>
+    
+    <div class="container">
+        
+        <div class="profile">
+            <img data-src="touxiang.png" alt="小源的头像" class="profile-avatar">
+            <div class="profile-name">小源呀</div>
+            <div class="profile-english-name">Xiaoyuan</div>
+            <div class="button-container">
+                <button class="btn btn-blue" data-type="social">My Social Platform</button>
+                <button class="btn btn-blue" data-type="resource">Share resources</button>
+                <button class="btn btn-white" data-type="fun">Small games</button>
+            </div>
+        </div>
+    </div>
+    <!-- 社交平台弹窗 -->
+    <div class="social-detail" id="socialDetail">
+        <div class="social-panel">
+            <div class="window-resize-edge left" onmousedown="startResize(event, this.parentElement, 'left')" ontouchstart="startResizeTouch(event, this.parentElement, 'left')"></div>
+            <div class="window-resize-edge right" onmousedown="startResize(event, this.parentElement, 'right')" ontouchstart="startResizeTouch(event, this.parentElement, 'right')"></div>
+            <div class="window-resize-edge top" onmousedown="startResize(event, this.parentElement, 'top')" ontouchstart="startResizeTouch(event, this.parentElement, 'top')"></div>
+            <div class="window-resize-edge bottom" onmousedown="startResize(event, this.parentElement, 'bottom')" ontouchstart="startResizeTouch(event, this.parentElement, 'bottom')"></div>
+            <div class="window-resize-edge corner-tl" onmousedown="startResize(event, this.parentElement, 'corner-tl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tl')"></div>
+            <div class="window-resize-edge corner-tr" onmousedown="startResize(event, this.parentElement, 'corner-tr')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tr')"></div>
+            <div class="window-resize-edge corner-bl" onmousedown="startResize(event, this.parentElement, 'corner-bl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-bl')"></div>
+            <div class="window-resize-edge corner-br" onmousedown="startResize(event, this.parentElement, 'corner-br')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-br')"></div>
+            
+            <div class="panel-header" onmousedown="startDrag(event, this.parentElement)" ontouchstart="startDragTouch(event, this.parentElement)">
+                <div class="panel-title">社交平台</div>
+                <div class="close-btn" onclick="hidePanel(this.closest('.social-detail'))"></div>
+            </div>
+            <div class="panel-content-wrapper">
+                <div class="panel-content">
+                    <div class="social-item" onclick="openKuaishouProfile()">
+                        <img data-src="ks.png" alt="快手图标" class="social-avatar">
+                        <div>
+                            <div class="social-name">我的快手主页</div>
+                            <div class="social-id">id:x1594482</div>
+                        </div>
+                        <div class="arrow-right"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 分享资源弹窗 -->
+    <div class="resource-detail" id="resourceDetail">
+        <div class="resource-panel">
+            <div class="window-resize-edge left" onmousedown="startResize(event, this.parentElement, 'left')" ontouchstart="startResizeTouch(event, this.parentElement, 'left')"></div>
+            <div class="window-resize-edge right" onmousedown="startResize(event, this.parentElement, 'right')" ontouchstart="startResizeTouch(event, this.parentElement, 'right')"></div>
+            <div class="window-resize-edge top" onmousedown="startResize(event, this.parentElement, 'top')" ontouchstart="startResizeTouch(event, this.parentElement, 'top')"></div>
+            <div class="window-resize-edge bottom" onmousedown="startResize(event, this.parentElement, 'bottom')" ontouchstart="startResizeTouch(event, this.parentElement, 'bottom')"></div>
+            <div class="window-resize-edge corner-tl" onmousedown="startResize(event, this.parentElement, 'corner-tl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tl')"></div>
+            <div class="window-resize-edge corner-tr" onmousedown="startResize(event, this.parentElement, 'corner-tr')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tr')"></div>
+            <div class="window-resize-edge corner-bl" onmousedown="startResize(event, this.parentElement, 'corner-bl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-bl')"></div>
+            <div class="window-resize-edge corner-br" onmousedown="startResize(event, this.parentElement, 'corner-br')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-br')"></div>
+            
+            <div class="panel-header" onmousedown="startDrag(event, this.parentElement)" ontouchstart="startDragTouch(event, this.parentElement)">
+                <div class="panel-title">分享资源</div>
+                <div class="close-btn" onclick="hidePanel(this.closest('.resource-detail'))"></div>
+            </div>
+            <div class="panel-content-wrapper">
+                <div class="panel-content">
+                    <div class="resource-item" onclick="openResourceLink('https://www.123912.com/s/0RONTd-ijSj3')">
+                        <img data-src="sy.png" alt="软件分享图标" class="resource-icon">
+                        <div class="resource-name">软件分享(Android应用)</div>
+                        <div class="arrow-right"></div>
+                    </div>
+                    <div class="resource-item" onclick="openResourceLink('https://www.123912.com/s/0RONTd-qjSj3')">
+                        <img data-src="mc.png" alt="Mc模组图标" class="resource-icon">
+                        <div class="resource-name">mc模组</div>
+                        <div class="arrow-right"></div>
+                    </div>
+                    <div class="resource-item" onclick="openResourceLink('https://www.123912.com/s/0RONTd-5jSj3')">
+                        <img data-src="yy.png" alt="所有资源图标" class="resource-icon">
+                        <div class="resource-name">所有资源</div>
+                        <div class="arrow-right"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 好玩的弹窗 -->
+    <div class="fun-detail" id="funDetail">
+        <div class="fun-panel">
+            <div class="window-resize-edge left" onmousedown="startResize(event, this.parentElement, 'left')" ontouchstart="startResizeTouch(event, this.parentElement, 'left')"></div>
+            <div class="window-resize-edge right" onmousedown="startResize(event, this.parentElement, 'right')" ontouchstart="startResizeTouch(event, this.parentElement, 'right')"></div>
+            <div class="window-resize-edge top" onmousedown="startResize(event, this.parentElement, 'top')" ontouchstart="startResizeTouch(event, this.parentElement, 'top')"></div>
+            <div class="window-resize-edge bottom" onmousedown="startResize(event, this.parentElement, 'bottom')" ontouchstart="startResizeTouch(event, this.parentElement, 'bottom')"></div>
+            <div class="window-resize-edge corner-tl" onmousedown="startResize(event, this.parentElement, 'corner-tl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tl')"></div>
+            <div class="window-resize-edge corner-tr" onmousedown="startResize(event, this.parentElement, 'corner-tr')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tr')"></div>
+            <div class="window-resize-edge corner-bl" onmousedown="startResize(event, this.parentElement, 'corner-bl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-bl')"></div>
+            <div class="window-resize-edge corner-br" onmousedown="startResize(event, this.parentElement, 'corner-br')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-br')"></div>
+            
+            <div class="panel-header" onmousedown="startDrag(event, this.parentElement)" ontouchstart="startDragTouch(event, this.parentElement)">
+                <div class="panel-title">好玩的</div>
+                <div class="close-btn" onclick="hidePanel(this.closest('.fun-detail'))"></div>
+            </div>
+            <div class="panel-content-wrapper">
+                <div class="panel-content">
+                    <div class="fun-item" onclick="openInfinitePopups()">
+                        <img data-src="ic0001.png" alt="无限弹窗图标" class="fun-icon">
+                        <div class="fun-name">无限弹窗</div>
+                        <div class="arrow-right"></div>
+                    </div>
+                    <div class="resource-item" onclick="openResourceLink('https://wer11145.github.io/think/')">
+                        <img data-src="ic0002.png" alt="其它图片" class="resource-icon">
+                        <div class="resource-name">外部链接</div>
+                        <div class="arrow-right"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 联系方式弹窗 -->
+    <div class="contact-detail" id="contactDetail">
+        <div class="contact-panel">
+            <div class="window-resize-edge left" onmousedown="startResize(event, this.parentElement, 'left')" ontouchstart="startResizeTouch(event, this.parentElement, 'left')"></div>
+            <div class="window-resize-edge right" onmousedown="startResize(event, this.parentElement, 'right')" ontouchstart="startResizeTouch(event, this.parentElement, 'right')"></div>
+            <div class="window-resize-edge top" onmousedown="startResize(event, this.parentElement, 'top')" ontouchstart="startResizeTouch(event, this.parentElement, 'top')"></div>
+            <div class="window-resize-edge bottom" onmousedown="startResize(event, this.parentElement, 'bottom')" ontouchstart="startResizeTouch(event, this.parentElement, 'bottom')"></div>
+            <div class="window-resize-edge corner-tl" onmousedown="startResize(event, this.parentElement, 'corner-tl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tl')"></div>
+            <div class="window-resize-edge corner-tr" onmousedown="startResize(event, this.parentElement, 'corner-tr')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tr')"></div>
+            <div class="window-resize-edge corner-bl" onmousedown="startResize(event, this.parentElement, 'corner-bl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-bl')"></div>
+            <div class="window-resize-edge corner-br" onmousedown="startResize(event, this.parentElement, 'corner-br')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-br')"></div>
+            
+            <div class="panel-header" onmousedown="startDrag(event, this.parentElement)" ontouchstart="startDragTouch(event, this.parentElement)">
+                <div class="panel-title">关于网站</div>
+                <div class="close-btn" onclick="hidePanel(this.closest('.contact-detail'))"></div>
+            </div>
+            <div class="panel-content-wrapper">
+             
+                <div class="panel-content">
+    <div style="text-align: center">
+        <img data-src="ic0003.png" alt="图标" style="width: 65%; height: 40%;  margin-bottom: 8px; object-fit: cover;">
+        <p style="font-size: 18px; color: var(--theme-color); font-weight: 600; margin: 0;">Xiaoyuan exclusive website</p>
+        <p style="font-size: 18px; color: var(--theme-color); font-weight: 600; margin: 0;">v1.3.0.0.5 beta </p>
+    </div>
+    <p style="text-align: center; font-size: 16px; margin: 0; padding: 8px 0;">通过电子邮箱:x114514-9178@outlook.com联系我</p>
+    <p style="text-align: center; font-size: 16px; margin: 0; padding: 8px 0;">Contact me via e-mail: x114514-9178@outlook.com</p>
+
+    <p style="text-align: center; font-size: 16px; margin: 0; padding: 8px 0;">大鲍鱼™</p>
+</div>
+              </div>
+            
+        </div>
+    </div>
+    <!-- 设置弹窗（包含主题切换） -->
+    <div class="setting-detail" id="settingDetail">
+        <div class="setting-panel">
+            <div class="window-resize-edge left" onmousedown="startResize(event, this.parentElement, 'left')" ontouchstart="startResizeTouch(event, this.parentElement, 'left')"></div>
+            <div class="window-resize-edge right" onmousedown="startResize(event, this.parentElement, 'right')" ontouchstart="startResizeTouch(event, this.parentElement, 'right')"></div>
+            <div class="window-resize-edge top" onmousedown="startResize(event, this.parentElement, 'top')" ontouchstart="startResizeTouch(event, this.parentElement, 'top')"></div>
+            <div class="window-resize-edge bottom" onmousedown="startResize(event, this.parentElement, 'bottom')" ontouchstart="startResizeTouch(event, this.parentElement, 'bottom')"></div>
+            <div class="window-resize-edge corner-tl" onmousedown="startResize(event, this.parentElement, 'corner-tl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tl')"></div>
+            <div class="window-resize-edge corner-tr" onmousedown="startResize(event, this.parentElement, 'corner-tr')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tr')"></div>
+            <div class="window-resize-edge corner-bl" onmousedown="startResize(event, this.parentElement, 'corner-bl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-bl')"></div>
+            <div class="window-resize-edge corner-br" onmousedown="startResize(event, this.parentElement, 'corner-br')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-br')"></div>
+            
+            <div class="panel-header" onmousedown="startDrag(event, this.parentElement)" ontouchstart="startDragTouch(event, this.parentElement)">
+                <div class="panel-title">设置</div>
+                <div class="close-btn" onclick="hidePanel(this.closest('.setting-detail'))"></div>
+            </div>
+            <div class="panel-content-wrapper">
+                <div class="setting-content">
+                    <div class="setting-item">
+                        <span class="setting-label">深色模式</span>
+                        <div class="dark-mode-control">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="darkModeToggle" onclick="toggleDarkMode()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <button class="btn btn-white" style="width: auto; padding: 4px 8px; font-size: 14px;" onclick="resetDarkModeToSystem()">默认</button>
+                        </div>
+                    </div>
+                    <!-- 主题切换（设置页内） -->
+                    <div class="setting-item">
+                        <span class="setting-label">主题颜色</span>
+                        <div class="theme-switch-group">
+                            <button class="theme-switch-btn active" id="blueThemeBtn" onclick="switchTheme('blue')">
+                                <span class="theme-btn-icon blue-theme-icon"></span>蓝色主题
+                            </button>
+                            <button class="theme-switch-btn" id="pinkThemeBtn" onclick="switchTheme('pink')">
+                                <span class="theme-btn-icon pink-theme-icon"></span>粉色主题
+                            </button>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">清除音乐记录</span>
+                        <button class="btn btn-white" style="width: auto; padding: 4px 8px; font-size: 14px;" onclick="clearMusicStorage()">清除</button>
+                    </div>
+                    <div class="setting-item" onclick="closeAllWindows()">
+                        <span class="setting-label">关闭所有窗口</span>
+                        <div class="arrow-right"></div>
+                    </div>
+                   <div class="setting-item" onclick="openPanel('contact')">
+    <span class="setting-label">关于网站</span>
+    <div class="arrow-right"></div>
+    
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+ <!-- 左下角设备信息容器 -->
+<div class="device-info">
+    <div id="deviceName">:</div>
+    <div id="ipAddress">IP:</div>
+</div>
+    <script>
+        // 基础变量
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const DARK_MODE_KEY = 'darkModeSetting';
+        const THEME_KEY = 'themeSetting'; // 主题存储键
+        let selectedBtn = null;
+        let isPanelOpen = false;
+        let currentZIndex = 2001;
+        
+        // 音乐相关
+        const musicElement = document.getElementById('backgroundMusic');
+        const musicBtnImg = document.getElementById('musicBtn').querySelector('img');
+        
+        // 拖动相关变量
+        let isDragging = false;
+        let dragTarget = null;
+        let startX = 0;
+        let startY = 0;
+        let targetLeft = 0;
+        let targetTop = 0;
+        
+        // 缩放相关变量
+        let isResizing = false;
+        let resizeTarget = null;
+        let resizeType = '';
+        let startWidth = 0;
+        let startHeight = 0;
+        let startLeft = 0;
+        let startTop = 0;
+        const minWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-min-width'));
+        const minHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-min-height'));
+        
+        // 初始化
+        window.onload = function() {
+            setMusicPaused();
+            initDarkMode();
+            initTheme(); // 初始化主题
+            bindButtonEvents();
+            bindGlobalEvents();
+            showWelcomeNotification();
+            // 图片加载完成后移除占位背景
+            document.querySelectorAll('img').forEach(img => {
+                img.onload = function() {
+                    this.style.backgroundColor = 'transparent';
+                };
+            });
+            // 3. 初始化显示设备信息
+
+    // 原有初始化逻辑保留，新增以下代码
+    document.getElementById('deviceName').textContent = `Equipment name:${getDeviceName()}`;
+    getIpAddress().then(ip => {
+        document.getElementById('ipAddress').textContent = `IP address：${ip}`;
+    });
+
+        };
+        
+        // 欢迎通知显示逻辑
+        function showWelcomeNotification() {
+            const notification = document.getElementById('welcomeNotification');
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 5000);
+        }
+        
+        // 绑定按钮点击事件
+        function bindButtonEvents() {
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', btnClickHandle);
+            });
+        }
+        
+        // 绑定全局事件
+        function bindGlobalEvents() {
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchmove', dragTouch, { passive: false });
+            document.addEventListener('touchend', stopDrag);
+            document.addEventListener('touchcancel', stopDrag);
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('mouseup', stopResize);
+            document.addEventListener('touchmove', resizeTouch, { passive: false });
+            document.addEventListener('touchend', stopResize);
+            document.addEventListener('touchcancel', stopResize);
+            document.addEventListener('click', addClickCircle);
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.btn') && !event.target.closest('.social-panel') && !event.target.closest('.resource-panel') && !event.target.closest('.contact-panel') && !event.target.closest('.fun-panel') && !event.target.closest('.setting-panel') && !event.target.closest('.blank-popup-panel') && !event.target.closest('.top-btn')) {
+                    cancelAllSelected();
+                }
+            });
+        }
+        
+        // 深色模式初始化
+        function initDarkMode() {
+            const savedSetting = localStorage.getItem(DARK_MODE_KEY);
+            const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.body.classList.remove('dark-mode');
+            if (savedSetting === 'dark') {
+                enableDarkMode();
+                darkModeToggle.checked = true;
+            } else if (savedSetting === 'light') {
+                disableDarkMode();
+                darkModeToggle.checked = false;
+            } else {
+                if (systemIsDark) {
+                    enableDarkMode();
+                    darkModeToggle.checked = true;
+                } else {
+                    disableDarkMode();
+                    darkModeToggle.checked = false;
+                }
+            }
+        }
+        
+        function enableDarkMode() {
+            document.body.classList.add('dark-mode');
+        }
+        
+        function disableDarkMode() {
+            document.body.classList.remove('dark-mode');
+            document.body.offsetHeight;
+        }
+        
+        function toggleDarkMode() {
+            const isDark = document.body.classList.contains('dark-mode');
+            if (isDark) {
+                disableDarkMode();
+                localStorage.setItem(DARK_MODE_KEY, 'light');
+                darkModeToggle.checked = false;
+            } else {
+                enableDarkMode();
+                localStorage.setItem(DARK_MODE_KEY, 'dark');
+                darkModeToggle.checked = true;
+            }
+        }
+        
+        function resetDarkModeToSystem() {
+            localStorage.removeItem(DARK_MODE_KEY);
+            initDarkMode();
+            alert('已恢复为系统默认模式');
+        }
+        
+        // 主题切换功能
+        function initTheme() {
+            const savedTheme = localStorage.getItem(THEME_KEY) || 'blue';
+            switchTheme(savedTheme);
+        }
+        
+        function switchTheme(theme) {
+            // 移除所有主题类
+            document.body.classList.remove('pink-theme');
+            // 添加选中主题类
+            if (theme === 'pink') {
+                document.body.classList.add('pink-theme');
+            }
+            // 更新按钮状态
+            document.getElementById('blueThemeBtn').classList.toggle('active', theme === 'blue');
+            document.getElementById('pinkThemeBtn').classList.toggle('active', theme === 'pink');
+            // 存储主题设置
+            localStorage.setItem(THEME_KEY, theme);
+        }
+        
+        // 音乐控制
+        function toggleMusic() {
+            if (musicElement.paused) {
+                musicElement.play().then(() => {
+                    musicBtnImg.src = 'sy2.png';
+                    localStorage.setItem('musicState', 'playing');
+                }).catch(err => {
+                    alert('浏览器限制自动播放，请手动授权或刷新页面后重试');
+                });
+            } else {
+                musicElement.pause();
+                musicBtnImg.src = 'sy1.png';
+                localStorage.setItem('musicState', 'paused');
+            }
+        }
+        
+        function setMusicPaused() {
+            musicElement.pause();
+            musicBtnImg.src = 'sy1.png';
+            localStorage.setItem('musicState', 'paused');
+        }
+        
+        function clearMusicStorage() {
+            localStorage.removeItem('musicState');
+            setMusicPaused();
+            alert('音乐记录已清除');
+        }
+        
+        // 按钮选择框逻辑
+        function btnClickHandle(event) {
+            const currentBtn = event.currentTarget;
+            const btnType = currentBtn.dataset.type;
+            if (selectedBtn === currentBtn) {
+                openPanel(btnType);
+                isPanelOpen = true;
+            } else {
+                cancelAllSelected();
+                currentBtn.classList.add('selected');
+                selectedBtn = currentBtn;
+                isPanelOpen = false;
+            }
+        }
+        
+        // 打开面板
+        function openPanel(type) {
+            let panelId = '';
+            switch(type) {
+                case 'social': panelId = 'socialDetail'; break;
+                case 'resource': panelId = 'resourceDetail'; break;
+                case 'fun': panelId = 'funDetail'; break;
+                case 'contact': panelId = 'contactDetail'; break;
+                case 'setting': panelId = 'settingDetail'; break;
+            }
+            const originalPanel = document.getElementById(panelId);
+            const popupDefaultWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-default-width'));
+            const popupDefaultHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-default-height'));
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const centerLeft = (screenWidth - popupDefaultWidth) / 2;
+            const centerTop = (screenHeight - popupDefaultHeight) / 2;
+            
+            const newPanel = originalPanel.cloneNode(true);
+            const newPanelId = panelId + '_' + Date.now();
+            newPanel.id = newPanelId;
+            const newPanelElement = newPanel.querySelector('[class$="-panel"]');
+            
+            newPanelElement.style.left = `${centerLeft}px`;
+            newPanelElement.style.top = `${centerTop}px`;
+            newPanelElement.style.width = `${popupDefaultWidth}px`;
+            newPanelElement.style.height = `${popupDefaultHeight}px`;
+            newPanelElement.style.zIndex = currentZIndex++;
+            
+            const resizeEdges = newPanelElement.querySelectorAll('.window-resize-edge');
+            resizeEdges.forEach(edge => {
+                let edgeType = '';
+                if (edge.classList.contains('left')) edgeType = 'left';
+                else if (edge.classList.contains('right')) edgeType = 'right';
+                else if (edge.classList.contains('top')) edgeType = 'top';
+                else if (edge.classList.contains('bottom')) edgeType = 'bottom';
+                else if (edge.classList.contains('corner-tl')) edgeType = 'corner-tl';
+                else if (edge.classList.contains('corner-tr')) edgeType = 'corner-tr';
+                else if (edge.classList.contains('corner-bl')) edgeType = 'corner-bl';
+                else if (edge.classList.contains('corner-br')) edgeType = 'corner-br';
+                
+                edge.onmousedown = (e) => startResize(e, newPanelElement, edgeType);
+                edge.ontouchstart = (e) => startResizeTouch(e, newPanelElement, edgeType);
+            });
+            
+            const newHeader = newPanelElement.querySelector('.panel-header');
+            newHeader.onmousedown = (e) => startDrag(e, newPanelElement);
+            newHeader.ontouchstart = (e) => startDragTouch(e, newPanelElement);
+            
+            const newCloseBtn = newPanelElement.querySelector('.close-btn');
+            newCloseBtn.onclick = () => hidePanel(newPanel);
+            
+            document.body.appendChild(newPanel);
+            setTimeout(() => {
+                newPanel.classList.add('active');
+            }, 10);
+        }
+        
+        // 隐藏单个面板
+        function hidePanel(panelElement) {
+            panelElement.classList.remove('active');
+            setTimeout(() => {
+                panelElement.remove();
+            }, 300);
+        }
+        
+        // 关闭所有窗口
+        function closeAllWindows() {
+            document.querySelectorAll('.social-detail, .resource-detail, .contact-detail, .fun-detail, .setting-detail').forEach(panel => {
+                if (panel.id.includes('_')) {
+                    panel.classList.remove('active');
+                    setTimeout(() => panel.remove(), 300);
+                } else {
+                    panel.classList.remove('active');
+                }
+            });
+            
+            document.querySelectorAll('.blank-popup-detail').forEach(popup => {
+                popup.classList.remove('active');
+                setTimeout(() => popup.remove(), 300);
+            });
+            
+            cancelAllSelected();
+            selectedBtn = null;
+            isPanelOpen = false;
+        }
+        
+        // 取消按钮选中状态
+        function cancelAllSelected() {
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            selectedBtn = null;
+        }
+        
+        // 打开快手主页
+        function openKuaishouProfile() {
+            window.open(`https://www.kuaishou.com/u/x1594482`, '_blank', 'noopener noreferrer');
+        }
+        
+        // 打开资源链接
+        function openResourceLink(url) {
+            window.open(url, '_blank', 'noopener noreferrer');
+        }
+        
+        // 点击动画
+        function addClickCircle(event) {
+            const circle = document.createElement('div');
+            circle.classList.add('click-circle');
+            circle.style.left = (event.clientX - 30) + 'px';
+            circle.style.top = (event.clientY - 30) + 'px';
+            document.body.appendChild(circle);
+            circle.classList.add('animate');
+            setTimeout(() => circle.remove(), 1000);
+        }
+        
+        // 无限弹窗
+        async function openInfinitePopups() {
+            const popupDefaultWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-default-width'));
+            const popupDefaultHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-default-height'));
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const centerLeft = (screenWidth - popupDefaultWidth) / 2;
+            const centerTop = (screenHeight - popupDefaultHeight) / 2;
+            
+            for (let i = 0; i < 25; i++) {
+                const popupText = await getRandomTextFromFile();
+                
+                setTimeout(() => {
+                    const popup = document.createElement('div');
+                    popup.className = 'blank-popup-detail';
+                    popup.style.position = 'fixed';
+                    popup.style.left = '0';
+                    popup.style.top = '0';
+                    
+                    const randomOffsetX = (Math.random() - 0.5) * 50;
+                    const randomOffsetY = (Math.random() - 0.5) * 50;
+                    const finalLeft = centerLeft + randomOffsetX;
+                    const finalTop = centerTop + randomOffsetY;
+                    
+                    popup.innerHTML = `
+                        <div class="blank-popup-panel" style="left: ${finalLeft}px; top: ${finalTop}px; width: ${popupDefaultWidth}px; height: ${popupDefaultHeight}px; z-index: ${currentZIndex++};">
+                            <div class="window-resize-edge left" onmousedown="startResize(event, this.parentElement, 'left')" ontouchstart="startResizeTouch(event, this.parentElement, 'left')"></div>
+                            <div class="window-resize-edge right" onmousedown="startResize(event, this.parentElement, 'right')" ontouchstart="startResizeTouch(event, this.parentElement, 'right')"></div>
+                            <div class="window-resize-edge top" onmousedown="startResize(event, this.parentElement, 'top')" ontouchstart="startResizeTouch(event, this.parentElement, 'top')"></div>
+                            <div class="window-resize-edge bottom" onmousedown="startResize(event, this.parentElement, 'bottom')" ontouchstart="startResizeTouch(event, this.parentElement, 'bottom')"></div>
+                            <div class="window-resize-edge corner-tl" onmousedown="startResize(event, this.parentElement, 'corner-tl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tl')"></div>
+                            <div class="window-resize-edge corner-tr" onmousedown="startResize(event, this.parentElement, 'corner-tr')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-tr')"></div>
+                            <div class="window-resize-edge corner-bl" onmousedown="startResize(event, this.parentElement, 'corner-bl')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-bl')"></div>
+                            <div class="window-resize-edge corner-br" onmousedown="startResize(event, this.parentElement, 'corner-br')" ontouchstart="startResizeTouch(event, this.parentElement, 'corner-br')"></div>
+                            
+                            <div class="panel-header" onmousedown="startDrag(event, this.parentElement)" ontouchstart="startDragTouch(event, this.parentElement)">
+                                <div class="panel-title">提示</div>
+                                <div class="close-btn" onclick="hidePanel(this.closest('.blank-popup-detail'))"></div>
+                            </div>
+                            <div class="panel-content-wrapper">
+                                <div class="blank-popup-content">
+                                    <p class="popup-text">${popupText}</p>
+                                    <div class="popup-btn-group">
+                                        <button class="popup-btn popup-btn-cancel" onclick="hidePanel(this.closest('.blank-popup-detail'))">取消</button>
+                                        <button class="popup-btn popup-btn-confirm" onclick="hidePanel(this.closest('.blank-popup-detail'))">确定</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(popup);
+                    setTimeout(() => {
+                        popup.classList.add('active');
+                    }, 10);
+                }, i * 200);
+            }
+        }
+        
+        // 获取弹窗文本
+        async function getRandomTextFromFile() {
+            try {
+                const response = await fetch('wenben.txt');
+                if (!response.ok) throw new Error('文件未找到');
+                const text = await response.text();
+                const lines = text.split('\n').filter(line => line.trim() !== '');
+                return lines.length > 0 ? lines[Math.floor(Math.random() * lines.length)].trim() : '错误';
+            } catch (error) {
+                return '错误';
+            }
+        }
+
+        // 鼠标拖动开始
+        function startDrag(event, target) {
+            if (event.target.closest('.close-btn') || event.target.closest('.popup-btn') || isResizing) return;
+            isDragging = true;
+            dragTarget = target;
+            dragTarget.classList.add('panel-dragging');
+            startX = event.clientX;
+            startY = event.clientY;
+            const rect = dragTarget.getBoundingClientRect();
+            targetLeft = rect.left;
+            targetTop = rect.top;
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        
+        // 触摸拖动开始
+        function startDragTouch(event, target) {
+            if (event.target.closest('.close-btn') || event.target.closest('.popup-btn') || isResizing) return;
+            const touch = event.touches[0];
+            isDragging = true;
+            dragTarget = target;
+            dragTarget.classList.add('panel-dragging');
+            startX = touch.clientX;
+            startY = touch.clientY;
+            const rect = dragTarget.getBoundingClientRect();
+            targetLeft = rect.left;
+            targetTop = rect.top;
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        
+        // 鼠标拖动中
+        function drag(event) {
+            if (!isDragging || !dragTarget) return;
+            const offsetX = event.clientX - startX;
+            const offsetY = event.clientY - startY;
+            const newLeft = targetLeft + offsetX;
+            const newTop = targetTop + offsetY;
+            dragTarget.style.left = `${newLeft}px`;
+            dragTarget.style.top = `${newTop}px`;
+            event.stopPropagation();
+        }
+        
+        // 触摸拖动中
+        function dragTouch(event) {
+            if (!isDragging || !dragTarget) return;
+            const touch = event.touches[0];
+            const offsetX = touch.clientX - startX;
+            const offsetY = touch.clientY - startY;
+            const newLeft = targetLeft + offsetX;
+            const newTop = targetTop + offsetY;
+            dragTarget.style.left = `${newLeft}px`;
+            dragTarget.style.top = `${newTop}px`;
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        
+        // 停止拖动
+        function stopDrag() {
+            if (dragTarget) {
+                dragTarget.classList.remove('panel-dragging');
+            }
+            isDragging = false;
+            dragTarget = null;
+        }
+        
+        // 鼠标缩放开始
+        function startResize(event, target, type) {
+            if (isDragging) return;
+            isResizing = true;
+            resizeTarget = target;
+            resizeType = type;
+            resizeTarget.classList.add('panel-resizing');
+            const rect = resizeTarget.getBoundingClientRect();
+            startWidth = rect.width;
+            startHeight = rect.height;
+            startLeft = rect.left;
+            startTop = rect.top;
+            startX = event.clientX;
+            startY = event.clientY;
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        
+        // 触摸缩放开始
+        function startResizeTouch(event, target, type) {
+            if (isDragging) return;
+            const touch = event.touches[0];
+            isResizing = true;
+            resizeTarget = target;
+            resizeType = type;
+            resizeTarget.classList.add('panel-resizing');
+            const rect = resizeTarget.getBoundingClientRect();
+            startWidth = rect.width;
+            startHeight = rect.height;
+            startLeft = rect.left;
+            startTop = rect.top;
+            startX = touch.clientX;
+            startY = touch.clientY;
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        
+        // 鼠标缩放中
+        function resize(event) {
+            if (!isResizing || !resizeTarget) return;
+            const offsetX = event.clientX - startX;
+            const offsetY = event.clientY - startY;
+            let newWidth = startWidth;
+            let newHeight = startHeight;
+            let newLeft = startLeft;
+            let newTop = startTop;
+            
+            switch(resizeType) {
+                case 'left':
+                    newWidth = Math.max(minWidth, startWidth - offsetX);
+                    newLeft = startLeft + offsetX;
+                    break;
+                case 'right':
+                    newWidth = Math.max(minWidth, startWidth + offsetX);
+                    break;
+                case 'top':
+                    newHeight = Math.max(minHeight, startHeight - offsetY);
+                    newTop = startTop + offsetY;
+                    break;
+                case 'bottom':
+                    newHeight = Math.max(minHeight, startHeight + offsetY);
+                    break;
+                case 'corner-tl':
+                    newWidth = Math.max(minWidth, startWidth - offsetX);
+                    newHeight = Math.max(minHeight, startHeight - offsetY);
+                    newLeft = startLeft + offsetX;
+                    newTop = startTop + offsetY;
+                    break;
+                case 'corner-tr':
+                    newWidth = Math.max(minWidth, startWidth + offsetX);
+                    newHeight = Math.max(minHeight, startHeight - offsetY);
+                    newTop = startTop + offsetY;
+                    break;
+                case 'corner-bl':
+                    newWidth = Math.max(minWidth, startWidth - offsetX);
+                    newHeight = Math.max(minHeight, startHeight + offsetY);
+                    newLeft = startLeft + offsetX;
+                    break;
+                case 'corner-br':
+                    newWidth = Math.max(minWidth, startWidth + offsetX);
+                    newHeight = Math.max(minHeight, startHeight + offsetY);
+                    break;
+            }
+            
+            resizeTarget.style.width = `${newWidth}px`;
+            resizeTarget.style.height = `${newHeight}px`;
+            resizeTarget.style.left = `${newLeft}px`;
+            resizeTarget.style.top = `${newTop}px`;
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        
+        // 触摸缩放中
+        function resizeTouch(event) {
+            if (!isResizing || !resizeTarget) return;
+            const touch = event.touches[0];
+            const offsetX = touch.clientX - startX;
+            const offsetY = touch.clientY - startY;
+            let newWidth = startWidth;
+            let newHeight = startHeight;
+            let newLeft = startLeft;
+            let newTop = startTop;
+            
+            switch(resizeType) {
+                case 'left':
+                    newWidth = Math.max(minWidth, startWidth - offsetX);
+                    newLeft = startLeft + offsetX;
+                    break;
+                case 'right':
+                    newWidth = Math.max(minWidth, startWidth + offsetX);
+                    break;
+                case 'top':
+                    newHeight = Math.max(minHeight, startHeight - offsetY);
+                    newTop = startTop + offsetY;
+                    break;
+                case 'bottom':
+                    newHeight = Math.max(minHeight, startHeight + offsetY);
+                    break;
+                case 'corner-tl':
+                    newWidth = Math.max(minWidth, startWidth - offsetX);
+                    newHeight = Math.max(minHeight, startHeight - offsetY);
+                    newLeft = startLeft + offsetX;
+                    newTop = startTop + offsetY;
+                    break;
+                case 'corner-tr':
+                    newWidth = Math.max(minWidth, startWidth + offsetX);
+                    newHeight = Math.max(minHeight, startHeight - offsetY);
+                    newTop = startTop + offsetY;
+                    break;
+                case 'corner-bl':
+                    newWidth = Math.max(minWidth, startWidth - offsetX);
+                    newHeight = Math.max(minHeight, startHeight + offsetY);
+                    newLeft = startLeft + offsetX;
+                    break;
+                case 'corner-br':
+                    newWidth = Math.max(minWidth, startWidth + offsetX);
+                    newHeight = Math.max(minHeight, startHeight + offsetY);
+                    break;
+            }
+            
+            resizeTarget.style.width = `${newWidth}px`;
+            resizeTarget.style.height = `${newHeight}px`;
+            resizeTarget.style.left = `${newLeft}px`;
+            resizeTarget.style.top = `${newTop}px`;
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        
+        // 停止缩放
+        function stopResize() {
+            if (resizeTarget) {
+                resizeTarget.classList.remove('panel-resizing');
+            }
+            isResizing = false;
+            resizeTarget = null;
+            resizeType = '';
+        }
+        // 1. 获取设备名称（通过浏览器UA解析）
+function getDeviceName() {
+    const userAgent = navigator.userAgent;
+    if (/iPhone/.test(userAgent)) return "iPhone";
+    if (/iPad/.test(userAgent)) return "iPad";
+    if (/Android/.test(userAgent)) return "Android";
+    if (/Windows/.test(userAgent)) return "Windows";
+    if (/Macintosh/.test(userAgent)) return "Mac";
+    if (/Linux/.test(userAgent)) return "Linux";
+    return "Unknown Device";
+}
+
+// 2. 获取IP地址（调用公开接口）
+async function getIpAddress() {
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+    } catch (error) {
+        return "Internal LAN";
+    }
+}
+
+
+    </script>
+    <script>
+  // 监听网页加载完成事件（DOM+资源加载完毕）
+  window.addEventListener('load', function() {
+    // 获取所有延迟加载的图片
+    const lazyImages = document.querySelectorAll('img[data-src]');
+    // 遍历图片，触发加载
+    lazyImages.forEach(img => {
+      img.src = img.dataset.src; // 赋值真实图片地址
+      img.removeAttribute('data-src'); // 移除自定义属性（避免重复处理）
+    });
+  });
+</script>
+</body>
+</body>
+</html>

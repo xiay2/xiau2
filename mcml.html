@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="icon" href="114514" type="image/png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的世界指令网站</title>
+    <style>
+    /* 全局鼠标样式（仅电脑端生效，适配sub.png图标） */
+@media screen and (min-width: 1024px) { /* 仅屏幕宽度≥1024px的设备（电脑）生效 */
+    body {
+        cursor: url("sub.png"), auto; /* 优先显示sub.png，兼容场景显示默认鼠标 */
+        /* 若sub.png尺寸过大，可添加尺寸限制（可选，单位px） */
+        /* cursor: url("sub.png") 8 8, auto; 前两个数值为鼠标热点位置，默认左上角(0 0) */
+    }
+    /* 按钮hover时保持自定义鼠标，避免还原默认（可选优化） */
+    button:hover {
+        cursor: url("sub.png"), pointer;
+    }
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 列表区域 */
+        .fullscreen-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        /* 滚动条样式 */
+        .fullscreen-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .fullscreen-list::-webkit-scrollbar-track {
+            background: #eee;
+        }
+        .fullscreen-list::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+        .fullscreen-list::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        .list-container {
+            max-width: 800px;
+            margin: 0 auto;
+            list-style: none;
+        }
+
+        .list-item {
+            padding: 25px;
+            margin-bottom: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .main-title {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .sub-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .content-text {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        /* 列表项复制按钮 */
+        .item-copy-btn {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .item-copy-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .item-copy-btn img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        /* 底部输入框区域 */
+        .input-section {
+            padding: 15px 20px;
+            background-color: white;
+            border-top: 1px solid #eee;
+            max-width: 100%;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.03);
+        }
+
+        .input-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #text-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            height: 40px;
+        }
+
+        #text-input:focus {
+            border-color: #4285f4;
+        }
+
+        /* 圆形图标按钮 */
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .icon-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .icon-btn img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        /* 复制提示 */
+        .copy-notify {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .copy-notify.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- 列表区域 -->
+    <div class="fullscreen-list">
+        <ul class="list-container">
+            <!-- 列表项 1 -->
+            <li class="list-item">
+                <div class="main-title">获得命令方块</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/give @s command_block</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+
+            <!-- 列表项 2 -->
+            <li class="list-item">
+                <div class="main-title">拒绝方块</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/give @s deny</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+
+            <!-- 列表项 3 -->
+            <li class="list-item">
+                <div class="main-title">允许方块</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/give @s allow</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">屏障方块</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/give @s barrier</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">结构方块</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/give @s structure_block</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li> 
+            
+            
+            <li class="list-item">
+                <div class="main-title">光源方块</div>
+                <div class="sub-title">亮度15</div>
+                <div class="content-text">/give @s light_block 1 15</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">边界方块</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/give @s border_block 1</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">Npc刷怪蛋</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/give @s spawn_egg 1 51</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">代理机器人刷怪蛋</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/give @s spawn_egg 1 56</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">结构空位</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/give @s structure_void 1</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">命令方块矿车</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/give @s command_block_minecart</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">重生锚</div>
+                <div class="sub-title">能量4</div>
+                <div class="content-text">/give @s respawn_anchor 1 4</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">爆炸末地水晶</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/summon minecraft:ender_crystal ~~~~~ minecraft:crystal_explode</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">隐藏命令方块提示</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/gamerule commandblockoutput false</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">清理掉落物</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/kill @e[type=item]</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">空白T</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">/tellraw @a {"rawtext":[{"text":"内容"}]}}</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">-</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">-</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+            <li class="list-item">
+                <div class="main-title">-</div>
+                <div class="sub-title">-</div>
+                <div class="content-text">-</div>
+                <button class="item-copy-btn">
+                    <img src="fz.png" alt="复制">
+                </button>
+            </li>
+            
+        </ul>
+        <a href="https://xiay2.github.io/s/">作者官网</a>
+    </div>
+
+    <!-- 底部输入框区域 -->
+    <div class="input-section">
+        <div class="input-container">
+            <input type="text" id="text-input" placeholder="请输入内容...">
+            <button class="icon-btn" id="clear-btn" title="清空">
+                <img src="lj.png" alt="清空">
+            </button>
+            <button class="icon-btn" id="bottom-copy-btn" title="复制">
+                <img src="fz.png" alt="复制">
+            </button>
+        </div>
+    </div>
+
+    <!-- 复制提示 -->
+    <div class="copy-notify">操作成功！</div>
+
+    <script>
+        // 列表项复制功能
+        const itemCopyBtns = document.querySelectorAll('.item-copy-btn');
+        const notify = document.querySelector('.copy-notify');
+        const textInput = document.getElementById('text-input');
+        const clearBtn = document.getElementById('clear-btn');
+        const bottomCopyBtn = document.getElementById('bottom-copy-btn');
+
+        // 列表项复制
+        itemCopyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const textElement = btn.closest('.list-item').querySelector('.content-text');
+                const textToCopy = textElement.textContent;
+                
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showNotify('列表文本已复制！');
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                });
+            });
+        });
+
+        // 清空输入框
+        clearBtn.addEventListener('click', () => {
+            textInput.value = '';
+            showNotify('输入框已清空！');
+        });
+
+        // 复制输入框内容
+        bottomCopyBtn.addEventListener('click', () => {
+            const inputText = textInput.value.trim();
+            if (inputText) {
+                navigator.clipboard.writeText(inputText).then(() => {
+                    showNotify('输入框内容已复制！');
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                });
+            } else {
+                showNotify('输入框为空，无法复制！');
+            }
+        });
+
+        // 显示提示信息
+        function showNotify(message) {
+            notify.textContent = message;
+            notify.classList.add('show');
+            setTimeout(() => {
+                notify.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
